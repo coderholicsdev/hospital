@@ -1,0 +1,295 @@
+.my-signin{
+    padding: 4px 15px!important;
+}
+
+
+/*👉.btn-icon {
+    position: absolute;
+    top: 43px;
+    right: 45px;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    font-size: 24px;
+    text-align: center;
+    cursor: pointer;
+    color: #fff;
+    opacity: 0.5;
+    -webkit-transition: all .4s ease-out 0s;
+    -o-transition: all .4s ease-out 0s;
+    -moz-transition: all .4s ease-out 0s;
+    transition: all .4s ease-out 0s;
+}👈*/
+
+.card:hover .btn-icon.pulse:after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
+    animation: pulse 1.5s infinite;
+    -webkit-animation: pulse 1.5s infinite;
+}
+
+.projects .btn-icon {
+    color: #fff;
+    opacity: 0;
+}
+
+.projects .card:hover .btn-icon {
+    opacity: 1;
+}
+
+
+
+
+
+
+
+
+
+
+.showcase.masonry .card {
+    background-color: var(--white-color);
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
+}
+
+.showcase .items .item .card.no-image .image-over:before {
+    background-color: var(--white-color);
+}
+
+.showcase.filter-section .card:hover .card-caption {
+    opacity: 0.2;
+}
+
+.showcase .card {
+    overflow: hidden;
+    height: auto;
+    background-color: transparent;
+}
+
+.showcase .card:not(.no-hover):hover {
+    transform: none;
+}
+
+.showcase .card .image-over {
+    overflow: hidden;
+}
+
+ /* imagine darken -- styles for image block */
+.showcase .card .image-over:before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);;
+    border-radius: 10px;
+    opacity: 0.9;
+    -webkit-transition: all .2s ease-out 0s;
+    -o-transition: all .2s ease-out 0s;
+    -moz-transition: all .2s ease-out 0s;
+    transition: all .2s ease-out 0s;
+}
+
+.showcase .card .image-over img {
+    position: relative;
+    z-index: -1;
+    height: 10px;
+    min-height: 360px;
+    object-fit: cover;
+    object-position: center;
+    -webkit-transition: all .3s ease-out 0s;
+    -o-transition: all .3s ease-out 0s;
+    -moz-transition: all .3s ease-out 0s;
+    transition: all .3s ease-out 0s;
+}
+
+ /* card effects -- styles for image block*/
+.showcase .card .card-body {
+    padding: 50px 25px;
+    transform: translateY(100px);
+    -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -o-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -moz-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.showcase .card:hover .card-body {
+    transform: translateY(0);
+}
+
+.showcase .card:hover .card-footer {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.showcase .card .card-body h4 {
+    margin-bottom: 50px;
+    -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -o-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -moz-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    color: #f9f9f9;
+}
+
+.showcase .card:hover .card-body h4 {
+    margin-bottom: 1.5rem;
+}
+
+.showcase .card .card-body p {
+    margin: 1.5rem 0 0;
+    -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -o-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -moz-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    opacity: 0;
+    color: #f9f9f9;
+    /*👉text-transform: uppercase;
+    text-decoration: underline;👈*/
+    
+}
+
+.showcase .card:hover .card-body p {
+    opacity: 1;
+}
+
+.showcase .card .card-footer .btn-icon {
+    margin: 0;
+}
+
+.showcase .card .card-footer .btn-icon {
+    margin: 0;
+    color: var(--white-color);
+    opacity: 1;
+}
+
+.showcase .card-caption {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}
+
+.showcase .no-image .card-caption {
+    position: relative;
+}
+
+.showcase .card-caption *, .showcase .card-caption *:not(.btn) {
+    color: var(--primary-bg-color);
+}
+
+.showcase .no-image .card-caption *, .showcase .no-image .card-caption *:not(.btn) {
+    color: var(--primary-t-color);
+}
+
+.showcase.odd .no-image .card-caption *, .showcase.odd .no-image .card-caption *:not(.btn) {
+    color: var(--secondary-t-color);
+}
+
+.showcase .no-image .card-caption .card-body p {
+    color: var(--primary-p-color);
+}
+
+.showcase.odd .no-image .card-caption .card-body p {
+    color: var(--secondary-p-color);
+}
+
+.showcase .card-footer {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    margin: auto;
+    padding: 50px 25px;
+    border: none;
+    -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -o-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -moz-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    opacity: 0;
+    transform: translateY(-100px);
+}
+
+.showcase .card-footer a:not(.btn) {
+    line-height: 1.2;
+    text-align: center;
+    color: var(--white-color);
+}
+
+.showcase .no-image .card-footer {
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+ /* mine - hovers */
+
+.showcase .card:hover .image-over:before {
+    opacity: 1;
+}
+
+.showcase .card:hover .image-over .mask-radius-full {
+    opacity: 0;
+}
+
+.showcase .card:hover .image-over img {
+    transform: scale(1.1);
+    filter: blur(2px);
+}
+
+.showcase .card:hover .image-over .play-video-full {
+    transform: translateY(-15%);
+}
+
+.my-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 45px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--card-bg-color);
+    -webkit-transition: all .4s ease-out 0s;
+    -o-transition: all .4s ease-out 0s;
+    -moz-transition: all .4s ease-out 0s;
+    transition: all .4s ease-out 0s;
+}
+
+
+
+
+
+
+/* Tabs % mobile */
+
+@media screen and (max-width: 800px) {
+.card-rsz{
+    min-height: 65vh!important;
+}
+}
+
+
+
+/* desktop */
+
+@media screen and (min-width: 800px) {
+    .card-rsz{
+       
+        max-height: 540px!important;
+    }
+}
+
+/* ipad pro */
+@media screen and (min-width: 960px) and (max-width: 1024px) {
+    
+    .card-rsz{
+       
+        /*👉max-height: 540px!important;👈*/
+        max-height: 38vh!important;
+    }
+}
+    
