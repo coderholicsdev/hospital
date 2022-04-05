@@ -258,3 +258,38 @@
     -moz-transition: all .4s ease-out 0s;
     transition: all .4s ease-out 0s;
 }
+
+
+
+
+
+
+/* Tabs % mobile */
+
+@media screen and (max-width: 800px) {
+.card-rsz{
+    min-height: 65vh!important;
+}
+}
+
+
+
+/* desktop */
+
+@media screen and (min-width: 800px) {
+    .card-rsz{
+       
+        max-height: 540px!important;
+    }
+}
+
+/* ipad pro */
+@media screen and (min-width: 960px) and (max-width: 1024px) {
+    
+    .card-rsz{
+       
+        /*👉max-height: 540px!important;👈*/
+        max-height: 38vh!important;
+    }
+}
+    
