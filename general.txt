@@ -1,0 +1,2 @@
+from api.models import all_hospitals_tuple
+all_hospitals_tuple()
