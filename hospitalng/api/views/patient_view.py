@@ -165,7 +165,6 @@ class PatientsRescheduledAppointments(AppointmentsStatusMixin):
     appointment_status = 'Rescheduled'
 
 class CancelAppointment(APIView):
-    serializer_class = BookAppointmentSerializer
     permission_classes = [IsAuthenticated, ]
 
     def post(self, request, appointment_id, *args, **kwargs):
@@ -186,7 +185,7 @@ class CancelAppointment(APIView):
 
         # get the same type of user for the logged in user and 
         # user that made the appointment
-        user_that_made_appointment = appointment.appointment_with.user.email
+        user_that_made_appointment = appointment.appointment_with.email
         logged_in_user =  request.user.email
 
         '''
