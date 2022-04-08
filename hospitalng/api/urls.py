@@ -37,9 +37,18 @@ urlpatterns += [
 urlpatterns+=[
     # patient dashboard
     path('patient/dashboard/', patient_view.PatientDashboard.as_view(), name='patient-dashboard'),
+
+    # appointments
     path('patient/available-appointments/', patient_view.ViewAppointments.as_view(), name='available-appointments'),
+
+    # create an appointment
+    path('patient/create-appointment/', patient_view.CreateAppointment.as_view(), name='create-appointment-patient'),
+
+    # book appointment 
     path('patient/book-appointment/<str:appointment_id>/', patient_view.BookAppointment.as_view(), name='patient-book-appointment'),
-    path('patient/booked-appointments/', patient_view.PatientsBookedAppointments.as_view(), name='booked-appointments'),
+    path('patient/booked-appointments-by-doctor/', patient_view.PatientsBookedAppointmentsByDoctor.as_view(), name='booked-appointments'),
+
+    # cancel appointment
     path('patient/cancelled-appointments/', patient_view.PatientsCancelledAppointment.as_view(), name='cancelled-appointments'),
     path('patient/cancel-appointment/<str:appointment_id>/', patient_view.CancelAppointment.as_view(), name='cancel-an-appointment'),
 
