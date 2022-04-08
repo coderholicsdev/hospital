@@ -96,8 +96,8 @@ class Appointment(models.Model):
         ('Cancelled', 'Cancelled'),
     )
     appointment_id = models.UUIDField(primary_key=True, default=uuid4)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='doctor_or_patient_booked_appointment')
-    appointment_with = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, default=1)
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, default=1)
     appointment_status = models.CharField(max_length=30, choices=appointment_status_options)
     date = models.DateField()
     time = models.TimeField()
