@@ -99,7 +99,8 @@ class Appointment(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='doctor_or_patient_booked_appointment')
     appointment_with = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     appointment_status = models.CharField(max_length=30, choices=appointment_status_options)
-    appointment_date_time = models.DateTimeField()
+    date = models.DateField()
+    time = models.TimeField()
 
     def __str__(self):
         return 'Appointment ID - ' + str(self.appointment_id)
