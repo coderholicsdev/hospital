@@ -15,8 +15,11 @@ View for patient Dashboard
 # import exception from django.db
 from django.core.exceptions import ObjectDoesNotExist
 
+# import User model
+from django.contrib.auth import get_user_model
+
 # GenericAPIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.views import APIView
 
 # response
@@ -28,7 +31,7 @@ from rest_framework import status
 # DRF permissions
 from rest_framework.permissions import IsAuthenticated
 
-# decorators 
+# decorators
 from api.decorators import check_patient_profile
 
 # import serializers
@@ -39,6 +42,9 @@ from api.serializers.appointment_serializer import AppointmentSerializer
 from api.models import PatientProfile
 from api.models import Appointment
 from api.serializers.appointment_serializer import BookAppointmentSerializer
+
+# User
+User = get_user_model()
 
 class CheckIsPatientMixin(APIView):
     model = None
@@ -75,19 +81,6 @@ class CheckIsPatientMixin(APIView):
 class PatientDashboard(CheckIsPatientMixin):
     model = PatientProfile
     serializer_class =  PatientProfileSerializer
-
-class ViewAppointments(ListAPIView, CheckIsPatientMixin):
-    '''
-    View to display all the available appointments with a Doctor
-    '''
-    serializer_class = AppointmentSerializer
-    queryset = Appointment.objects.all()
-    status = 'Open'
-    permission_classes = [IsAuthenticated, ]
-    
-    def get_queryset(self):
-        queryset = Appointment.objects.filter(appointment_status=self.status)
-        return queryset
 
 class BookAppointment(APIView):
     '''
@@ -128,18 +121,25 @@ class BookAppointment(APIView):
             status=status.HTTP_201_CREATED
         )
 
+'''
+This section represents all the views that the
+appointment was created by the doctor (i.e appointment_with
+= patients)
+'''
+
 class AppointmentsStatusMixin(ListAPIView):
     '''
-    To allow patients view the appointments they have made
-    if any
+    To deal with all appointments (i.e booked, rescheduled, cancelled) 
+    that were made by the doctor to see the patient.
     '''
     serializer_class = AppointmentSerializer
     queryset = Appointment.objects.all()
     permission_classes = [IsAuthenticated, ]
     
     def get_queryset(self):
+        user = User.objects.get(email=self.request.user)
         try:
-            patient = PatientProfile.objects.get(user=self.request.user)
+            patient = PatientProfile.objects.get(user=user)
         except ObjectDoesNotExist:
             return Response(data={
                 'error': 'You are not allowed to view this page'
@@ -147,14 +147,15 @@ class AppointmentsStatusMixin(ListAPIView):
             status=status.HTTP_403_FORBIDDEN
             )
             
-        queryset = Appointment.objects.filter(appointment_with=patient, 
+        queryset = Appointment.objects.filter(patient=patient, 
         appointment_status=self.appointment_status)
 
         return queryset
 
-class PatientsBookedAppointments(AppointmentsStatusMixin):
-    # Get all the booked appointments a user has made if any
+class PatientsBookedAppointmentsByDoctor(AppointmentsStatusMixin):
+    # Get all the booked appointments a doctor has with a user
     appointment_status = 'Booked'
+
 
 class PatientsCancelledAppointment(AppointmentsStatusMixin):
     # Get all the appointment that the user cancelled or was cancelled by
@@ -185,16 +186,16 @@ class CancelAppointment(APIView):
 
         # get the same type of user for the logged in user and 
         # user that made the appointment
-        user_that_made_appointment = appointment.appointment_with.email
+        patient_appointment_is_for = appointment.patient.user.email
         logged_in_user =  request.user.email
 
         '''
         if the user that made the appointment is not the logged in user
         return an error and a 401 status
         '''
-        if user_that_made_appointment != logged_in_user:
+        if patient_appointment_is_for != logged_in_user:
             return Response(data=
-                {'error': 'Sorry you did not make this appointment'},
+                {'error': 'Sorry this Appointment is not for you'},
                 status=status.HTTP_401_UNAUTHORIZED)
         
         # if the appointment has already been cancelled
@@ -222,3 +223,14 @@ class CancelAppointment(APIView):
             }
         )
         
+class CreateAppointment(CreateAPIView):
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = BookAppointmentSerializer
+
+    def perform_create(self, serializer):
+        patient = PatientProfile.objects.get(user=self.request.user)
+        serializer.save(
+            patient=patient,
+            appointment_status='Booked'
+        )
+
