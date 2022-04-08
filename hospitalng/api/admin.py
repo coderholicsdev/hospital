@@ -44,4 +44,4 @@ class AdminProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Appointment)
 class ApointmentAdmin(admin.ModelAdmin):
-    list_display = ['created_by', 'appointment_with', 'appointment_status']
+    list_display = ['doctor', 'patient', 'appointment_status']
