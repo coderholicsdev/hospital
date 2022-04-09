@@ -55,4 +55,12 @@ urlpatterns+=[
 
 urlpatterns += [
     path('doctor/dashboard/', doctor_view.DoctorsDashboard.as_view(), name='doctors-homepage'),
+
+    # appointments (booked, cancelled, rescheduled)
+    path('doctor/booked-appointments/', doctor_view.DoctorBookedAppointments.as_view(), name='doctor-booked-appointments'),
+    path('doctor/cancelled-appointments/', doctor_view.DoctorCancelledAppointment.as_view(), name='doctor-cancelled-appointments'),
+    path('doctor/rescheduled-appointments/', doctor_view.DoctorRescheduledAppointments.as_view(), name='doctor-rescheduled-appointments'),
+
+    # reschedule an appointment
+    path('doctor/reschedule-appointment/<str:appointment_id>/', doctor_view.RescheduleAppointmentWithPatient.as_view(), name='reschedule-appointment-with-patient')
 ]
