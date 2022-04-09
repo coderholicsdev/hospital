@@ -135,27 +135,35 @@ class AppointmentsStatusMixin(ListAPIView):
     serializer_class = AppointmentSerializer
     queryset = Appointment.objects.all()
     permission_classes = [IsAuthenticated, ]
-    
-    def get_queryset(self):
+    model_profile = PatientProfile
+
+    def get_queryset(self):        
+        queryset = Appointment.objects.filter(
+        appointment_status=self.appointment_status, 
+        **self.appointment_kwargs()
+        )
+        return queryset
+
+    def user_doc_patient_check(self):
         user = User.objects.get(email=self.request.user)
         try:
-            patient = PatientProfile.objects.get(user=user)
+            patient_doc = self.model_profile.objects.get(user=user)
         except ObjectDoesNotExist:
             return Response(data={
                 'error': 'You are not allowed to view this page'
             },
             status=status.HTTP_403_FORBIDDEN
             )
-            
-        queryset = Appointment.objects.filter(patient=patient, 
-        appointment_status=self.appointment_status)
+        return patient_doc
 
-        return queryset
+    def appointment_kwargs(self, **kwargs):
+        patient = self.user_doc_patient_check()
+        kwargs['patient'] = patient
+        return kwargs
 
 class PatientsBookedAppointmentsByDoctor(AppointmentsStatusMixin):
     # Get all the booked appointments a doctor has with a user
     appointment_status = 'Booked'
-
 
 class PatientsCancelledAppointment(AppointmentsStatusMixin):
     # Get all the appointment that the user cancelled or was cancelled by

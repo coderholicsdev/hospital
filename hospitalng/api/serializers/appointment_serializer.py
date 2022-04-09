@@ -23,13 +23,25 @@ from api.models import Appointment, DoctorProfile
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
+    '''
+    serializer to view appointment used to view
+    cancelled schedules, Reschedule, and booked
+    appointments
+    '''
     doctor = serializers.CharField(source='doctor.name')
+    patient = serializers.CharField(source='patient.user.last_name')
+
     class Meta:
         model = Appointment
-        fields = ['appointment_id', 'doctor', 'date', 'time']
+        fields = ['appointment_id', 'patient', 'doctor', 'date', 'time']
 
 class BookAppointmentSerializer(serializers.ModelSerializer):
+    '''
+    serializer to help patients book appointments with
+    a doctor
+    '''
     doctor = serializers.CharField(allow_blank=False, allow_null=False)
+
     class Meta:
         model = Appointment
         fields = ['doctor', 'date', 'time']
@@ -53,3 +65,12 @@ class BookAppointmentSerializer(serializers.ModelSerializer):
         if attrs < today:
             raise serializers.ValidationError({'error':'You cannot book an appointment a past date.'})
         return super().validate(attrs)
+
+class RescheduleSerializer(serializers.ModelSerializer):
+    '''
+    serializer to handle Doctor being able to reschedule an
+    appointment with a patient.
+    '''
+    class Meta:
+        model = Appointment
+        fields = ['patient', 'date', 'time']
