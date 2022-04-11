@@ -33,7 +33,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['appointment_id', 'patient', 'doctor', 'date', 'time']
+        fields = ['appointment_id', 'appointment_status', 'patient', 'doctor', 'date', 'time']
 
 class BookAppointmentSerializer(serializers.ModelSerializer):
     '''
@@ -71,6 +71,7 @@ class RescheduleSerializer(serializers.ModelSerializer):
     serializer to handle Doctor being able to reschedule an
     appointment with a patient.
     '''
+    patient = serializers.EmailField(allow_blank=False)
     class Meta:
         model = Appointment
         fields = ['patient', 'date', 'time']
