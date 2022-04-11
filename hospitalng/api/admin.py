@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from api.forms.admin_form import UserCreationForm, UserChangeForm
-from api.models import User, Hospital, PatientProfile, DoctorProfile, AdminProfile, Appointment
+from api.models import User, Hospital, PatientProfile, DoctorProfile, AdminProfile, Appointment, MyHospital
 
 
 @admin.register(User)
@@ -45,3 +45,7 @@ class AdminProfileAdmin(admin.ModelAdmin):
 @admin.register(Appointment)
 class ApointmentAdmin(admin.ModelAdmin):
     list_display = ['doctor', 'patient', 'appointment_status']
+
+@admin.register(MyHospital)
+class MyHospitalAdmin(admin.ModelAdmin):
+    list_display = ['hospital', 'patient']
