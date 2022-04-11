@@ -19,7 +19,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import get_user_model
 
 # GenericAPIView
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
 from rest_framework.views import APIView
 
 # response
@@ -37,11 +37,11 @@ from api.decorators import check_patient_profile
 # import serializers
 from api.serializers.profile_serializer import PatientProfileSerializer
 from api.serializers.appointment_serializer import AppointmentSerializer
-
-# import patient model
-from api.models import PatientProfile
-from api.models import Appointment
+from api.serializers.hospital_serializers import MyHospitalSerializer
 from api.serializers.appointment_serializer import BookAppointmentSerializer
+
+# import models
+from api.models import PatientProfile, Appointment, MyHospital
 
 # User
 User = get_user_model()
@@ -161,7 +161,7 @@ class AppointmentsStatusMixin(ListAPIView):
         kwargs['patient'] = patient
         return kwargs
 
-class PatientsBookedAppointmentsByDoctor(AppointmentsStatusMixin):
+class PatientsBookedAppointments(AppointmentsStatusMixin):
     # Get all the booked appointments a doctor has with a user
     appointment_status = 'Booked'
 
@@ -242,3 +242,37 @@ class CreateAppointment(CreateAPIView):
             appointment_status='Booked'
         )
 
+
+# Patients "My Hospital"
+class CreateMyHospitalView(CreateAPIView):
+    # create a hospital for the patients My Hospital section
+    serializer_class = MyHospitalSerializer
+    permission_classes = [IsAuthenticated, ]
+    
+    def perform_create(self, serializer):
+        '''over ride perform_create and pass the user to the
+        patient attribute'''
+        user = User.objects.get(email=self.request.user)
+        return serializer.save(patient=user)
+
+class DeleteMyHospitalView(DestroyAPIView):
+    # delete a hospital for the patients My Hospital section
+    queryset = MyHospital.objects.all()
+    serializer_class = MyHospitalSerializer
+    permission_classes = [IsAuthenticated, ]
+    lookup_field = 'hospital_id'
+
+    def get_queryset(self):
+        hospital_id = self.kwargs
+        queryset = MyHospital.objects.filter(**hospital_id)
+        return queryset
+
+class ViewMyHospitals(ListAPIView):
+    serializer_class = MyHospitalSerializer
+    queryset = MyHospital.objects.all()
+    permission_classes = [IsAuthenticated, ]
+
+    def get_queryset(self):
+        user = User.objects.get(email=self.request.user)
+        queryset = MyHospital.objects.filter(patient=user)
+        return queryset
