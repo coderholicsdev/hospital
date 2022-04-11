@@ -10,6 +10,10 @@ from api.managers import UserManager
 
 
 class User(AbstractUser):
+    '''
+    Modification of User to use email
+    instead of username as the primary authentication key
+    '''
     username = None
     email = models.EmailField(_('email address'), unique=True)
 
@@ -21,7 +25,19 @@ class User(AbstractUser):
     def __str__(self):
         return self.email 
 
+class Hospital(models.Model):
+    # model for the hospital registered.
+    hospital_id = models.UUIDField(default=uuid4, primary_key = True)
+    name = models.CharField(max_length=200)
+    address = models.CharField(max_length=200)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 class PatientProfile(models.Model):
+    # model for a patient's profile
     marital_status_list = (
         ('Single', 'Single'),
         ('Married', 'Married'),
@@ -51,18 +67,13 @@ class PatientProfile(models.Model):
     def __str__(self):
         return self.user.email
 
-
-class Hospital(models.Model):
-    name = models.CharField(max_length=200)
-    address = models.CharField(max_length=200)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
+class MyHospital(models.Model):
+    patient = models.ForeignKey(User, on_delete=models.CASCADE)
+    hospital = models.OneToOneField(Hospital, on_delete=models.CASCADE)
 
 
 class DoctorProfile(models.Model):
+    # model for a doctor's profile
     doctor_title = (
         ('Doctor','Doctor'),
         ('Radiographer','Radiographer'),
@@ -81,6 +92,7 @@ class DoctorProfile(models.Model):
         return self.name
 
 class AdminProfile(models.Model):
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='profile_picture/admin/')
     full_name = models.CharField(max_length=100, default='')
@@ -95,7 +107,7 @@ class Appointment(models.Model):
         ('Suspended', 'Suspended'),
         ('Cancelled', 'Cancelled'),
     )
-    appointment_id = models.UUIDField(primary_key=True, default=uuid4)
+    appointment_id = models.UUIDField(default=uuid4)
     patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, default=1)
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, default=1)
     appointment_status = models.CharField(max_length=30, choices=appointment_status_options)
