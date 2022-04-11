@@ -43,7 +43,7 @@ urlpatterns+=[
 
     # book appointment 
     path('patient/book-appointment/<str:appointment_id>/', patient_view.BookAppointment.as_view(), name='patient-book-appointment'),
-    path('patient/booked-appointments/', patient_view.PatientsBookedAppointmentsByDoctor.as_view(), name='booked-appointments'),
+    path('patient/booked-appointments/', patient_view.PatientsBookedAppointments.as_view(), name='booked-appointments'),
 
     # cancel appointment
     path('patient/cancelled-appointments/', patient_view.PatientsCancelledAppointment.as_view(), name='cancelled-appointments'),
@@ -51,10 +51,18 @@ urlpatterns+=[
 
     # rescheduled
     path('patient/rescheduled-appointments/', patient_view.PatientsRescheduledAppointments.as_view(), name='rescheduled-appointments'),
+
+    # my hospital
+    path('patient/my-hospital/create/<str:hospital_id>/', patient_view.CreateMyHospitalView.as_view(), name='create-patient-my-hospital'),
+    path('patient/my-hospital/delete/<str:hospital_id>/', patient_view.DeleteMyHospitalView.as_view(), name='delete-patient-my-hospital'),
+    path('patient/my-hospitals/', patient_view.ViewMyHospitals.as_view(), name='all-patient-my-hospital'),
 ]
 
 urlpatterns += [
     path('doctor/dashboard/', doctor_view.DoctorsDashboard.as_view(), name='doctors-homepage'),
+
+    # appointment schedule timing
+    path('doctor/appointment-scheduling/', doctor_view.AllAppointmentsDashboard.as_view(), name='doctors-appointment-schedule-timing'),
 
     # appointments (booked, cancelled, rescheduled)
     path('doctor/booked-appointments/', doctor_view.DoctorBookedAppointments.as_view(), name='doctor-booked-appointments'),
