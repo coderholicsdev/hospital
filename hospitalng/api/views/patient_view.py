@@ -14,12 +14,18 @@ View for patient Dashboard
 '''
 # import exception from django.db
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 
 # import User model
 from django.contrib.auth import get_user_model
 
-# GenericAPIView
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
+# Views from rest_framework
+from rest_framework.generics import (
+    ListAPIView,
+    CreateAPIView,
+    DestroyAPIView,
+    UpdateAPIView
+    )
 from rest_framework.views import APIView
 
 # response
@@ -39,12 +45,21 @@ from api.serializers.profile_serializer import PatientProfileSerializer
 from api.serializers.appointment_serializer import AppointmentSerializer
 from api.serializers.hospital_serializers import MyHospitalSerializer
 from api.serializers.appointment_serializer import BookAppointmentSerializer
+from api.serializers.ewallet_serializer import FundAccountSerializer, EwalletSerializer
 
 # import models
-from api.models import PatientProfile, Appointment, MyHospital
+from api.models import (
+    PatientProfile,
+    Appointment,
+    MyHospital,
+    Ewallet,
+    )
 
 # User
 User = get_user_model()
+
+class PermissionMixin:
+    permission_classes = [IsAuthenticated, ]
 
 class CheckIsPatientMixin(APIView):
     model = None
@@ -275,4 +290,47 @@ class ViewMyHospitals(ListAPIView):
     def get_queryset(self):
         user = User.objects.get(email=self.request.user)
         queryset = MyHospital.objects.filter(patient=user)
+        return queryset
+
+''' Patients E-Wallet '''
+class EwalletView(PermissionMixin, ListAPIView):
+    serializer_class = EwalletSerializer
+    queryset = Ewallet.objects.all()
+
+    def get_queryset(self):
+        user = User.objects.get(email=self.request.user)
+        queryset = Ewallet.objects.filter(user=user)
+        return queryset
+
+class CreateWalletAccount(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(email=request.user)
+        try:
+            ewallet_instance = Ewallet.objects.create(user=user, amount=0)
+        except IntegrityError:
+            return Response(
+                {'error': 'You already Have an E-wallet created'},
+                status=400
+            )
+        serializer = EwalletSerializer(ewallet_instance)
+        return Response(
+            {
+                'success': 'E-Wallet successfully created.',
+                'wallet-information': serializer.data
+            }
+        )
+class FundWalletAccount(PermissionMixin, UpdateAPIView):
+    '''
+    updates the balance of the user when a successful payment
+    has been received 
+    '''
+    serializer_class = FundAccountSerializer
+    queryset = Ewallet.objects.all()
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        user = User.objects.get(email=self.request.user)
+        queryset = Ewallet.objects.filter(user=user)
         return queryset
