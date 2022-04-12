@@ -56,6 +56,11 @@ urlpatterns+=[
     path('patient/my-hospital/create/<str:hospital_id>/', patient_view.CreateMyHospitalView.as_view(), name='create-patient-my-hospital'),
     path('patient/my-hospital/delete/<str:hospital_id>/', patient_view.DeleteMyHospitalView.as_view(), name='delete-patient-my-hospital'),
     path('patient/my-hospitals/', patient_view.ViewMyHospitals.as_view(), name='all-patient-my-hospital'),
+
+    # E-wallets
+    path('patient/wallet/', patient_view.EwalletView.as_view(), name='patient-wallet'),
+    path('patient/wallet/create-ewallet/', patient_view.CreateWalletAccount.as_view(), name='create-patient-wallet'),
+    path('patient/wallet/fund-account/<str:id>/', patient_view.FundWalletAccount.as_view(), name='fund-wallet'),
 ]
 
 urlpatterns += [
