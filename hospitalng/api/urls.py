@@ -10,6 +10,7 @@ from .views.authentication_views import RegisterView
 from .views.profile_create_views import CreatePatientProfileView, CreateDoctorProfileView, CreateAdminProfileView
 from .views import patient_view
 from .views import doctor_view
+from .views import admin_view
 
 
 app_name = 'api'
@@ -76,4 +77,14 @@ urlpatterns += [
 
     # reschedule an appointment
     path('doctor/reschedule-appointment/<str:appointment_id>/', doctor_view.RescheduleAppointmentWithPatient.as_view(), name='reschedule-appointment-with-patient')
+]
+
+'''
+admin routes
+'''
+urlpatterns += [
+    path('admin/hospital/all/', admin_view.ViewHospitals.as_view(), name='all-hospitals'),
+    path('admin/hospital/create/', admin_view.CreateHospitalPageView.as_view(), name='create-hospital'),
+    path('admin/hospital/delete/<str:hospital_id>/', admin_view.DeleteHospitalPageView.as_view(), name='delete-hospital'),
+    path('admin/hospital/update/<str:hospital_id>/', admin_view.UpdateHospitalPageView.as_view(), name='update-hospital'),
 ]

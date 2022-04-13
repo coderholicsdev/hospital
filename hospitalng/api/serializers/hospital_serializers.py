@@ -6,8 +6,13 @@ Serializer to handle all things Hospital
 # serializers
 from rest_framework import serializers
 
-from api.models import MyHospital
+from api.models import MyHospital, Hospital
 
+
+class HospitalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hospital
+        fields = '__all__'
 
 class MyHospitalSerializer(serializers.ModelSerializer):
     class Meta:
