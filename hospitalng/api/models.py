@@ -1,4 +1,4 @@
-# import uuid 
+# import uuid
 from uuid import uuid4
 # AbstracUser, models and Ugettext
 from django.contrib.auth.models import AbstractUser
@@ -125,3 +125,24 @@ class Ewallet(models.Model):
 
     def __str__(self):
         return f'E-wallet ID - {self.id}'
+  
+class Invoice(models.Model):
+    invoice_status_list = (
+        ('Expired', 'Expired'),
+        ('Paid', 'Paid'),
+        ('Unpaid', 'Unpaid'),
+    )
+
+    invoice_id = models.CharField(unique=True, max_length=9)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    invoice_status = models.CharField(max_length=30, choices=invoice_status_list)
+    address = models.TextField()
+    issued_date = models.DateField()
+    due_date = models.DateField()
+    paid_date = models.DateField()
+
+class InvoiceItem(models.Model):
+    invoice = models.ForeignKey(Invoice, related_name='items', on_delete=models.CASCADE)
+    description = models.CharField(max_length=100)
+    unit_price = models.DecimalField(max_digits=8, decimal_places=2)
+    quantity = models.DecimalField(max_digits=8, decimal_places=2, default=1)
