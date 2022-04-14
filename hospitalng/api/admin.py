@@ -3,7 +3,18 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from api.forms.admin_form import UserCreationForm, UserChangeForm
-from api.models import User, Hospital, PatientProfile, DoctorProfile, AdminProfile, Appointment, MyHospital, Ewallet
+from api.models import (
+    User,
+    Hospital,
+    PatientProfile,
+    DoctorProfile,
+    AdminProfile,
+    Appointment,
+    MyHospital,
+    Ewallet,
+    Invoice,
+    InvoiceItem
+    )
 
 
 @admin.register(User)
@@ -53,3 +64,11 @@ class MyHospitalAdmin(admin.ModelAdmin):
 @admin.register(Ewallet)
 class EwalletAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'amount']
+
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = ['invoice_id', 'user',]
+
+@admin.register(InvoiceItem)
+class InvoiceItemAdmin(admin.ModelAdmin):
+    list_display = ['invoice', 'description']
