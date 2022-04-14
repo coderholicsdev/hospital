@@ -16,6 +16,9 @@ View for patient Dashboard
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 
+# import timezone
+from django.utils import timezone
+
 # import User model
 from django.contrib.auth import get_user_model
 
@@ -24,7 +27,8 @@ from rest_framework.generics import (
     ListAPIView,
     CreateAPIView,
     DestroyAPIView,
-    UpdateAPIView
+    UpdateAPIView,
+    GenericAPIView
     )
 from rest_framework.views import APIView
 
@@ -46,6 +50,7 @@ from api.serializers.appointment_serializer import AppointmentSerializer
 from api.serializers.hospital_serializers import MyHospitalSerializer
 from api.serializers.appointment_serializer import BookAppointmentSerializer
 from api.serializers.ewallet_serializer import FundAccountSerializer, EwalletSerializer
+from api.serializers.invoice_serializer import InvoicesSerializer
 
 # import models
 from api.models import (
@@ -53,7 +58,12 @@ from api.models import (
     Appointment,
     MyHospital,
     Ewallet,
+    Invoice,
+    InvoiceItem
     )
+
+# import invoice_id generator
+from api.utils.invoice_id import generate_invoice_id
 
 # User
 User = get_user_model()
@@ -251,7 +261,26 @@ class CreateAppointment(CreateAPIView):
     serializer_class = BookAppointmentSerializer
 
     def perform_create(self, serializer):
-        patient = PatientProfile.objects.get(user=self.request.user)
+        '''over-ride the perform_create method'''
+        user = self.request.user
+        # get the patientprofile Model
+        patient = PatientProfile.objects.get(user=user)
+
+        # generate the invoice
+        invoice = Invoice.objects.create(
+            invoice_id=generate_invoice_id(),
+            user=user,
+            invoice_status='Unpaid',
+            issued_date=timezone.localdate(),
+        )
+
+        InvoiceItem(
+            invoice=invoice,
+            description= f'Appointment with the Doctor',
+            unit_price=7800.00
+        ).save()
+        
+        # save the serializer
         serializer.save(
             patient=patient,
             appointment_status='Booked'
@@ -334,3 +363,22 @@ class FundWalletAccount(PermissionMixin, UpdateAPIView):
         user = User.objects.get(email=self.request.user)
         queryset = Ewallet.objects.filter(user=user)
         return queryset
+
+
+# Invoicing
+class ViewInvoices(GenericAPIView):
+    queryset = Invoice.objects.all()
+    serializer_class = InvoicesSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response(
+            serializer.data
+        )
+
+    def get_queryset(self):
+        queryset = Invoice.objects.filter(user=self.request.user)
+        return queryset
+
+    
