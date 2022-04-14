@@ -62,6 +62,9 @@ urlpatterns+=[
     path('patient/wallet/', patient_view.EwalletView.as_view(), name='patient-wallet'),
     path('patient/wallet/create-ewallet/', patient_view.CreateWalletAccount.as_view(), name='create-patient-wallet'),
     path('patient/wallet/fund-account/<str:id>/', patient_view.FundWalletAccount.as_view(), name='fund-wallet'),
+
+    # Invoices
+    path('patient/invoices/', patient_view.ViewInvoices.as_view(), name='patient-invoices'),
 ]
 
 urlpatterns += [
