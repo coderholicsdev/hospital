@@ -138,11 +138,16 @@ class Invoice(models.Model):
     invoice_status = models.CharField(max_length=30, choices=invoice_status_list)
     address = models.TextField()
     issued_date = models.DateField()
-    due_date = models.DateField()
-    paid_date = models.DateField()
+    paid_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.invoice_id
 
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, related_name='items', on_delete=models.CASCADE)
     description = models.CharField(max_length=100)
     unit_price = models.DecimalField(max_digits=8, decimal_places=2)
-    quantity = models.DecimalField(max_digits=8, decimal_places=2, default=1)
+    quantity = models.IntegerField(default=1)
+
+    def __str__(self):
+        return self.description
