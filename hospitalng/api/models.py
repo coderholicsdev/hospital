@@ -1,9 +1,13 @@
 # import uuid
 from uuid import uuid4
+
 # AbstracUser, models and Ugettext
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import ugettext as _
+
+# import slugify
+from django.utils.text import slugify
 
 # import custom manager
 from api.managers import UserManager
@@ -151,3 +155,22 @@ class InvoiceItem(models.Model):
 
     def __str__(self):
         return self.description
+
+class Rating(models.Model):
+    stars = models.IntegerField()
+    no_of_ratings = models.IntegerField()
+
+class Pharmacy(models.Model):
+    product_title = models.CharField(max_length=500)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    ratings = models.ForeignKey(Rating, on_delete=models.CASCADE)
+    overview = models.TextField()
+
+class Specialty(models.Model):
+    title = models.CharField(max_length=300)
+    slug = models.SlugField()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)

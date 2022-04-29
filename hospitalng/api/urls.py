@@ -42,7 +42,7 @@ urlpatterns+=[
     # create an appointment
     path('patient/create-appointment/', patient_view.CreateAppointment.as_view(), name='create-appointment-patient'),
 
-    # book appointment 
+    # book appointment
     path('patient/book-appointment/<str:appointment_id>/', patient_view.BookAppointment.as_view(), name='patient-book-appointment'),
     path('patient/booked-appointments/', patient_view.PatientsBookedAppointments.as_view(), name='booked-appointments'),
 
@@ -54,7 +54,8 @@ urlpatterns+=[
     path('patient/rescheduled-appointments/', patient_view.PatientsRescheduledAppointments.as_view(), name='rescheduled-appointments'),
 
     # my hospital
-    path('patient/my-hospital/create/<str:hospital_id>/', patient_view.CreateMyHospitalView.as_view(), name='create-patient-my-hospital'),
+    path('patient/my-hospital/create/', patient_view.CreateMyHospitalView.as_view(), name='create-patient-my-hospital'),
+    # path('patient/my-hospital/create/<str:hospital_id>/', patient_view.CreateMyHospitalView.as_view(), name='create-patient-my-hospital'),
     path('patient/my-hospital/delete/<str:hospital_id>/', patient_view.DeleteMyHospitalView.as_view(), name='delete-patient-my-hospital'),
     path('patient/my-hospitals/', patient_view.ViewMyHospitals.as_view(), name='all-patient-my-hospital'),
 
@@ -62,9 +63,15 @@ urlpatterns+=[
     path('patient/wallet/', patient_view.EwalletView.as_view(), name='patient-wallet'),
     path('patient/wallet/create-ewallet/', patient_view.CreateWalletAccount.as_view(), name='create-patient-wallet'),
     path('patient/wallet/fund-account/<str:id>/', patient_view.FundWalletAccount.as_view(), name='fund-wallet'),
+    path('patient/wallet/pay/<str:invoice_id>/', patient_view.PayInvoiceWithEwallet.as_view(), name='pay-invoice-with-wallet'),
 
     # Invoices
     path('patient/invoices/', patient_view.ViewInvoices.as_view(), name='patient-invoices'),
+    path('patient/invoice/<str:invoice_id>/', patient_view.PayThisInvoice.as_view(), name='pay-single-invoice'),
+    path('patient/invoice/update/<str:invoice_id>/', patient_view.UpdateInvoice.as_view(), name='update-invoice'),
+
+    # process patients cart item
+    path('patient/cart/process/', patient_view.ProcessCartItems.as_view(), name='process-cart-items'),
 ]
 
 urlpatterns += [
@@ -86,8 +93,19 @@ urlpatterns += [
 admin routes
 '''
 urlpatterns += [
+    # hospitals
     path('admin/hospital/all/', admin_view.ViewHospitals.as_view(), name='all-hospitals'),
     path('admin/hospital/create/', admin_view.CreateHospitalPageView.as_view(), name='create-hospital'),
     path('admin/hospital/delete/<str:hospital_id>/', admin_view.DeleteHospitalPageView.as_view(), name='delete-hospital'),
     path('admin/hospital/update/<str:hospital_id>/', admin_view.UpdateHospitalPageView.as_view(), name='update-hospital'),
+
+    # invoices
+    path('admin/invoices/paid/', admin_view.PaidInvoices.as_view(), name='paid-invoices'),
+    path('admin/invoices/unpaid/', admin_view.UnPaidInvoices.as_view(), name='unpaid-invoices'),
+
+    # specialty
+    path('admin/specialty/create/', admin_view.CreateSpecialty.as_view(), name='add-specialty'),
+    path('admin/specialty/all/', admin_view.ViewSpeiclaties.as_view(), name='view-all-specialties'),
+    path('admin/specialty/update/<slug:specialty_slug>/', admin_view.UpdateSpecialties.as_view(), name='update-specialty'),
+    path('admin/specialty/delete/<slug:specialty_slug>/', admin_view.DeleteSpecialty.as_view(), name='delete-specialty'),
 ]

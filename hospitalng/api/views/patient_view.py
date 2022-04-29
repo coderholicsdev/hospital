@@ -28,7 +28,8 @@ from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
     UpdateAPIView,
-    GenericAPIView
+    GenericAPIView,
+    RetrieveAPIView,
     )
 from rest_framework.views import APIView
 
@@ -50,7 +51,8 @@ from api.serializers.appointment_serializer import AppointmentSerializer
 from api.serializers.hospital_serializers import MyHospitalSerializer
 from api.serializers.appointment_serializer import BookAppointmentSerializer
 from api.serializers.ewallet_serializer import FundAccountSerializer, EwalletSerializer
-from api.serializers.invoice_serializer import InvoicesSerializer
+from api.serializers.invoice_serializer import InvoicesSerializer, UpdateInvoiceSerializer
+from api.serializers.cart_serializer import CartSerializer
 
 # import models
 from api.models import (
@@ -101,7 +103,6 @@ class CheckIsPatientMixin(APIView):
             },
             status=status.HTTP_403_FORBIDDEN
             )
-
 
 class PatientDashboard(CheckIsPatientMixin):
     model = PatientProfile
@@ -367,6 +368,9 @@ class FundWalletAccount(PermissionMixin, UpdateAPIView):
 
 # Invoicing
 class ViewInvoices(GenericAPIView):
+    '''
+    patients can view all their invoices both paid and unpaid
+    '''
     queryset = Invoice.objects.all()
     serializer_class = InvoicesSerializer
     permission_classes = [IsAuthenticated, ]
@@ -381,4 +385,147 @@ class ViewInvoices(GenericAPIView):
         queryset = Invoice.objects.filter(user=self.request.user)
         return queryset
 
+class PayThisInvoice(RetrieveAPIView):
+    '''
+    patients can select an invoice and make a payment with it
+    '''
+    queryset = Invoice.objects.all()
+    serializer_class = InvoicesSerializer
+    permission_classes = [IsAuthenticated, ]
+    lookup_field = 'invoice_id'
+
     
+    def get_queryset(self):
+        queryset = Invoice.objects.filter(user=self.request.user)
+        return queryset
+
+
+class UpdateInvoice(GenericAPIView):
+    serializer_class = UpdateInvoiceSerializer
+    permission_classes = [IsAuthenticated,]
+
+    def put(self, request, invoice_id, *args, **kwargs):
+        invoice_get = Invoice.objects.get(user=request.user, invoice_id=invoice_id)
+        if invoice_get.invoice_status == 'Paid':
+            return Response(
+                {
+                    'error': 'This invoice has already been paid for',
+                },
+                status=400
+            )
+        invoice = Invoice.objects.filter(user=request.user, invoice_id=invoice_id)
+        invoice.update(invoice_status='Paid')
+        serializer = self.get_serializer(invoice, many=True)
+
+        return Response(
+            {
+                'success': 'Invoice Updated',
+                'data': serializer.data
+            }
+        )
+
+class PayInvoiceWithEwallet(GenericAPIView):
+    def put(self, request, invoice_id):
+        user = request.user
+        invoice_get = Invoice.objects.get(user=user, invoice_id=invoice_id)
+
+        if invoice_get.invoice_status=='Paid':
+            return Response(
+                {
+                    'error': 'This Invoice is marked as paid'
+                },
+                status=400
+            )
+
+        # get the patients E-wallet
+        wallet = Ewallet.objects.get(user=user)
+        wallet_balance = wallet.amount
+
+        # get the price of the items from the invoice
+        invoice_items = InvoiceItem.objects.filter(invoice=invoice_get)
+
+        # total sum of invoice items 
+        # (while calculating the total of unit_price * quantity)
+        invoice_items_total = sum(
+            [item.unit_price * item.quantity for item in invoice_items]
+            )
+
+        print(invoice_items_total)
+
+        # when the wallet balance is less than the total_invoice_amount
+        if wallet_balance < invoice_items_total:
+            return Response(
+                {
+                    'error': 'Your Wallet Balance is too low, Top up your account to continue'
+                }
+            )
+        
+        # get the new balance 
+        new_balance = wallet_balance - invoice_items_total
+
+        # update the wallet balance
+        Ewallet.objects.filter(user=user).update(amount=new_balance)
+
+        # update the invoice status and update the paid date
+        Invoice.objects.filter(user=user, invoice_id=invoice_id).update(invoice_status='Paid', paid_date=timezone.localdate())
+
+        return Response(
+            {
+                'success': 'Payment successfully made with your E-Wallet',
+            }
+        )
+
+'''
+Views to handle the processing of items from the cart
+into one invoice
+'''
+class ProcessCartItems(GenericAPIView):
+    serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request):
+        # get the serializer and validate data
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.data
+        else:
+            return Response({
+                'errors': serializer.errors
+                })
+        
+        # collect the json data from the serializer
+        cart_items = data['cart_items']
+
+        # create the invoice
+        invoice = Invoice.objects.create(
+            invoice_id= generate_invoice_id(),
+            user=request.user,
+            invoice_status='Unpaid',
+            address='Richard Mille Hospitals',
+            issued_date=timezone.localdate()
+        )
+
+        invoice_items_list = list()
+
+        for item_position in range(len(cart_items)):
+            cart_item = cart_items[item_position]
+            invoice_item = InvoiceItem(
+                invoice=invoice,
+                description=cart_item['product'],
+                unit_price=cart_item['price'],
+                quantity=cart_item['quantity']
+            )
+
+            invoice_items_list.append(invoice_item)
+
+        InvoiceItem.objects.bulk_create(invoice_items_list)
+
+        invoice_serializer = InvoicesSerializer(invoice)
+
+        return Response(
+            {
+                'success': 'Your cart is ready to be paid for',
+                'data':invoice_serializer.data
+            },
+            status=201
+        )

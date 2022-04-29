@@ -15,6 +15,7 @@ class HospitalSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class MyHospitalSerializer(serializers.ModelSerializer):
+    hospital = serializers.CharField(source='hospital.name')
     class Meta:
         model = MyHospital
         fields = ['hospital', ]
