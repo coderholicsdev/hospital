@@ -11,12 +11,16 @@ from .views.profile_create_views import CreatePatientProfileView, CreateDoctorPr
 from .views import patient_view
 from .views import doctor_view
 from .views import admin_view
+from .views import general_views
 
 
 app_name = 'api'
 
-
 urlpatterns = [
+    path('all/hospitals/', general_views.ListAllHospitals.as_view(), name='all-hospitals')
+]
+
+urlpatterns += [
     # authentication routes
 
     # register route
