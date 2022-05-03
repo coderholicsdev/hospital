@@ -201,11 +201,12 @@ SIMPLE_JWT = {
 }
 
 # CORS ALLOWED ORIGINS
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4653",
-    "http://172.105.101.134",
-    "http://127.0.0.1:5501",
-]
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:4653",
+#     "http://172.105.101.134",
+#     "http://127.0.0.1:5501",
+# ]
 
 # CORS_ALLOWED_ORIGINS = [
 #     '*'
